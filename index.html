@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ultimate All-in-One Calculator — Sab Kuch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1: #0f172a; --bg2:#061224; --card: linear-gradient(135deg,#0b1b2a, #10243a);
+      --glass: rgba(255,255,255,0.03); --muted:#9fb0c8; --accent:#06b6d4; --accent2:#7c3aed;
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+    body{margin:0;min-height:100vh;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:#e6eef6}
+    header{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.03)}
+    header h1{margin:0;font-size:18px}
+    .container{max-width:1200px;margin:20px auto;padding:18px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 10px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .card h2{margin:0 0 8px 0;font-size:16px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    input,select,button,textarea{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:inherit}
+    .display{background:var(--glass);padding:10px;border-radius:8px;min-height:36px;font-size:14px}
+    .full{grid-column:1/-1}
+    footer{margin-top:14px;text-align:center;color:var(--muted);font-size:13px}
+    .btn{cursor:pointer;border:none;padding:8px 10px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#012;box-shadow:0 6px 18px rgba(12,20,40,0.6)}
+    .small{font-size:12px;color:var(--muted)}
+    pre{white-space:pre-wrap;font-family:inherit}
+    @media(max-width:1000px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:640px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ultimate All-in-One Calculator — Modern</h1>
+    <div style="margin-left:auto;color:var(--muted);font-size:13px">Save as <code>index.html</code> and open in browser</div>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <!-- Expression -->
+      <section class="card">
+        <h2>Expression Evaluator</h2>
+        <div class="controls">
+          <input id="expr" placeholder="Example: (2+3)*5/7 + Math.sqrt(16)" style="flex:1" />
+          <button class="btn" onclick="evalExpr()">Evaluate</button>
+        </div>
+        <div class="display" id="exprOut">—</div>
+        <div class="small">JS expressions allowed: <code>Math.sqrt, Math.pow, Math.sin</code> etc. (runs locally)</div>
+      </section>
+
+      <!-- Basic -->
+      <section class="card">
+        <h2>Basic Calculator</h2>
+        <div class="display" id="basicDisplay">0</div>
+        <div class="controls" id="basicButtons">
+          <button onclick="basicPress('7')">7</button>
+          <button onclick="basicPress('8')">8</button>
+          <button onclick="basicPress('9')">9</button>
+          <button onclick="basicOp('/')">÷</button>
+          <button onclick="basicPress('4')">4</button>
+          <button onclick="basicPress('5')">5</button>
+          <button onclick="basicPress('6')">6</button>
+          <button onclick="basicOp('*')">×</button>
+          <button onclick="basicPress('1')">1</button>
+          <button onclick="basicPress('2')">2</button>
+          <button onclick="basicPress('3')">3</button>
+          <button onclick="basicOp('-')">−</button>
+          <button onclick="basicPress('0')">0</button>
+          <button onclick="basicPress('.')">.</button>
+          <button onclick="basicEquals()">=</button>
+          <button onclick="basicOp('+')">+</button>
+          <button onclick="basicClear()">C</button>
+          <button onclick="basicBack()">⌫</button>
+          <button onclick="basicPercent()">%</button>
+        </div>
+      </section>
+
+      <!-- Scientific -->
+      <section class="card">
+        <h2>Scientific</h2>
+        <div class="controls">
+          <input id="sciInput" placeholder="Number" />
+          <select id="sciFunc">
+            <option value="sqrt">√x</option>
+            <option value="square">x²</option>
+            <option value="cube">x³</option>
+            <option value="ln">ln(x)</option>
+            <option value="log10">log₁₀(x)</option>
+            <option value="sin">sin(x) — deg</option>
+            <option value="cos">cos(x) — deg</option>
+            <option value="tan">tan(x) — deg</option>
+            <option value="fact">n!</option>
+            <option value="pow">xʸ (use second input)</option>
+          </select>
+          <input id="sciInput2" placeholder="Second number (for xʸ)" />
+          <button class="btn" onclick="runScientific()">Calculate</button>
+        </div>
+        <div class="display" id="sciDisplay">—</div>
+      </section>
+
+      <!-- Unit -->
+      <section class="card">
+        <h2>Unit Converter</h2>
+        <div class="controls">
+          <select id="unitType" onchange="renderUnitOptions()">
+            <option value="length">Length</option>
+            <option value="weight">Weight</option>
+            <option value="temperature">Temperature</option>
+            <option value="speed">Speed</option>
+          </select>
+          <input id="unitVal" placeholder="Value" />
+          <select id="unitFrom"></select>
+          <select id="unitTo"></select>
+          <button class="btn" onclick="convertUnit()">Convert</button>
+        </div>
+        <div class="display" id="unitResult">—</div>
+      </section>
+
+      <!-- Currency -->
+      <section class="card">
+        <h2>Currency (Offline)</h2>
+        <div class="controls">
+          <input id="curVal" placeholder="Amount" />
+          <select id="curFrom"><option>INR</option><option>USD</option><option>EUR</option><option>GBP</option></select>
+          <select id="curTo"><option>USD</option><option>INR</option><option>EUR</option><option>GBP</option></select>
+          <button class="btn" onclick="convertCurrency()">Convert</button>
+        </div>
+        <div class="display" id="curResult">Tip: For live rates I can add API support.</div>
+      </section>
+
+      <!-- BMI -->
+      <section class="card">
+        <h2>BMI</h2>
+        <div class="controls">
+          <input id="bmiW" placeholder="Weight (kg)" />
+          <input id="bmiH" placeholder="Height (cm)" />
+          <button class="btn" onclick="calcBMI()">Calculate</button>
+        </div>
+        <div class="display" id="bmiOut">—</div>
+      </section>
+
+      <!-- EMI -->
+      <section class="card">
+        <h2>EMI & Amortization</h2>
+        <div class="controls">
+          <input id="loanP" placeholder="Principal (₹)" />
+          <input id="loanR" placeholder="Annual Rate (%)" />
+          <input id="loanN" placeholder="Years" />
+          <button class="btn" onclick="calcEMI(true)">Calculate + Schedule</button>
+        </div>
+        <div class="display" id="loanOut">—</div>
+      </section>
+
+      <!-- Percentage -->
+      <section class="card">
+        <h2>Percentage / % Change</h2>
+        <div class="controls">
+          <input id="pA" placeholder="Part / New" />
+          <input id="pB" placeholder="Whole / Old" />
+          <button class="btn" onclick="calcPercent()">%</button>
+          <button class="btn" onclick="calcChange()">% Change</button>
+        </div>
+        <div class="display" id="pctOut">—</div>
+      </section>
+
+      <!-- Statistics -->
+      <section class="card">
+        <h2>Statistics (comma separated)</h2>
+        <div class="controls">
+          <input id="statsIn" placeholder="e.g. 2,3,5,7,11" style="flex:1" />
+          <button class="btn" onclick="doStats()">Compute</button>
+        </div>
+        <div class="display" id="statsOut">—</div>
+      </section>
+
+      <!-- Number tools -->
+      <section class="card">
+        <h2>Number Tools</h2>
+        <div class="controls">
+          <input id="numA" placeholder="Number A" />
+          <input id="numB" placeholder="Number B (for gcd/lcm)" />
+          <button class="btn" onclick="gcdlcm()">GCD / LCM</button>
+          <button class="btn" onclick="isPrime()">Prime?</button>
+          <button class="btn" onclick="baseConvert()">Base Convert</button>
+        </div>
+        <div class="display" id="numOut">—</div>
+      </section>
+
+      <!-- Date diff full width -->
+      <section class="card full">
+        <h2>Age / Date Difference</h2>
+        <div class="controls">
+          <label class="small">From:</label>
+          <input id="dFrom" type="date" />
+          <label class="small">To:</label>
+          <input id="dTo" type="date" />
+          <button class="btn" onclick="dateDiff()">Calculate Difference</button>
+        </div>
+        <div class="display" id="dateOut">—</div>
+      </section>
+
+      <!-- Matrix Calculator -->
+      <section class="card">
+        <h2>Matrix Calculator (2x2 & 3x3)</h2>
+        <div class="small">Enter values comma separated rows; example 1,2;3,4 for 2x2</div>
+        <div class="controls">
+          <input id="matA" placeholder="Matrix A e.g. 1,2;3,4" style="flex:1" />
+          <input id="matB" placeholder="Matrix B (for add/sub/mul)" style="flex:1" />
+        </div>
+        <div class="controls">
+          <button class="btn" onclick="matAdd()">A + B</button>
+          <button class="btn" onclick="matSub()">A - B</button>
+          <button class="btn" onclick="matMul()">A × B</button>
+          <button class="btn" onclick="matDetA()">det(A)</button>
+          <button class="btn" onclick="matInvA()">inv(A)</button>
+        </div>
+        <pre class="display" id="matOut">—</pre>
+      </section>
+
+      <!-- Equation Solver -->
+      <section class="card">
+        <h2>Equation Solver</h2>
+        <div class="small">Linear ax + b = 0 and Quadratic ax²+bx+c=0</div>
+        <div class="controls">
+          <input id="eqA" placeholder="a" style="width:70px" />
+          <input id="eqB" placeholder="b" style="width:70px" />
+          <input id="eqC" placeholder="c (leave empty for linear)" style="width:120px" />
+          <button class="btn" onclick="solveEq()">Solve</button>
+        </div>
+        <div class="display" id="eqOut">—</div>
+      </section>
+
+      <!-- Percentage & GST / Discounts -->
+      <section class="card">
+        <h2>GST / Discount / Profit & Loss</h2>
+        <div class="controls">
+          <input id="price" placeholder="Price" />
+          <input id="percent" placeholder="Percent" />
+          <select id="pctType"><option value="add">Add (eg. GST)</option><option value="sub">Subtract (eg. discount)</option></select>
+          <button class="btn" onclick="applyPercent()">Apply</button>
+        </div>
+        <div class="display" id="gstOut">—</div>
+      </section>
+
+      <!-- Constants -->
+      <section class="card">
+        <h2>Scientific Constants</h2>
+        <div class="display">π = 3.141592653589793 | e = 2.718281828459045 | φ = 1.6180339887</div>
+      </section>
+
+      <!-- Compound Interest -->
+      <section class="card">
+        <h2>Compound Interest</h2>
+        <div class="controls">
+          <input id="ciP" placeholder="Principal" />
+          <input id="ciR" placeholder="Annual Rate %" />
+          <input id="ciN" placeholder="Times per year" />
+          <input id="ciT" placeholder="Years" />
+          <button class="btn" onclick="calcCompound()">Calculate</button>
+        </div>
+        <div class="display" id="ciOut">—</div>
+      </section>
+
+      <!-- SIP / Investment -->
+      <section class="card">
+        <h2>SIP / Investment Return</h2>
+        <div class="controls">
+          <input id="sipAmt" placeholder="Monthly SIP" />
+          <input id="sipRate" placeholder="Annual Rate %" />
+          <input id="sipYears" placeholder="Years" />
+          <button class="btn" onclick="calcSIP()">Calculate</button>
+        </div>
+        <div class="display" id="sipOut">—</div>
+      </section>
+
+      <!-- Time / Unit -->
+      <section class="card">
+        <h2>Time Converter</h2>
+        <div class="controls">
+          <input id="timeVal" placeholder="Value" style="width:90px" />
+          <select id="timeFrom"><option value="s">Seconds</option><option value="m">Minutes</option><option value="h">Hours</option><option value="d">Days</option></select>
+          <select id="timeTo"><option value="s">Seconds</option><option value="m">Minutes</option><option value="h">Hours</option><option value="d">Days</option></select>
+          <button class="btn" onclick="convertTime()">Convert</button>
+        </div>
+        <div class="display" id="timeOut">—</div>
+      </section>
+
+      <!-- Fuel Efficiency -->
+      <section class="card">
+        <h2>Fuel Efficiency / Mileage</h2>
+        <div class="controls">
+          <input id="dist" placeholder="Distance (km)" />
+          <input id="fuel" placeholder="Fuel used (litres)" />
+          <button class="btn" onclick="calcMileage()">Calculate km/l & l/100km</button>
+        </div>
+        <div class="display" id="mileageOut">—</div>
+      </section>
+
+      <!-- Electricity Bill -->
+      <section class="card">
+        <h2>Electricity Bill Estimator (simple slab)</h2>
+        <div class="controls">
+          <input id="unitsUsed" placeholder="Units used" />
+          <button class="btn" onclick="estimateBill()">Estimate</button>
+        </div>
+        <div class="display" id="billOut">—</div>
+      </section>
+
+      <!-- Physics Formulas -->
+      <section class="card">
+        <h2>Physics (Force, Energy, Pressure)</h2>
+        <div class="controls">
+          <input id="mass" placeholder="Mass (kg) - for Force" />
+          <input id="acc" placeholder="Acceleration (m/s²)" />
+          <button class="btn" onclick="calcForce()">F = ma</button>
+          <input id="massE" placeholder="Mass (kg) - for Energy" />
+          <input id="vel" placeholder="Velocity (m/s)" />
+          <button class="btn" onclick="calcKE()">KE = 1/2 mv²</button>
+          <input id="forceP" placeholder="Force (N) - for Pressure" />
+          <input id="areaP" placeholder="Area (m²)" />
+          <button class="btn" onclick="calcPressure()">Pressure</button>
+        </div>
+        <div class="display" id="physOut">—</div>
+      </section>
+
+      <!-- Ohm's Law -->
+      <section class="card">
+        <h2>Ohm's Law</h2>
+        <div class="controls">
+          <input id="voltage" placeholder="V (volts)" />
+          <input id="current" placeholder="I (amps)" />
+          <input id="resistance" placeholder="R (ohms)" />
+          <button class="btn" onclick="ohmCalc()">Compute</button>
+        </div>
+        <div class="display" id="ohmOut">—</div>
+      </section>
+
+      <!-- Resistor Color Code -->
+      <section class="card">
+        <h2>Resistor Color Code (4-band)</h2>
+        <div class="controls">
+          <select id="rc1"></select>
+          <select id="rc2"></select>
+          <select id="rc3"></select>
+          <select id="rc4"></select>
+          <button class="btn" onclick="resistorCalc()">Decode</button>
+        </div>
+        <div class="display" id="resOut">—</div>
+      </section>
+
+      <!-- Speed Distance Time -->
+      <section class="card">
+        <h2>Speed / Distance / Time</h2>
+        <div class="controls">
+          <input id="spd" placeholder="Speed (km/h)" />
+          <input id="dist2" placeholder="Distance (km)" />
+          <input id="time2" placeholder="Time (hours)" />
+          <button class="btn" onclick="calcSDT()">Compute missing</button>
+        </div>
+        <div class="display" id="sdtOut">—</div>
+      </section>
+
+      <!-- Binary/Hex/Dec -->
+      <section class="card">
+        <h2>Base Converters & Bitwise</h2>
+        <div class="controls">
+          <input id="baseNum" placeholder="Number (decimal)" />
+          <button class="btn" onclick="baseAll()">Convert</button>
+          <input id="bitA" placeholder="A (int)" />
+          <input id="bitB" placeholder="B (int)" />
+          <button class="btn" onclick="bitwiseOps()">AND/OR/XOR</button>
+        </div>
+        <div class="display" id="baseOut">—</div>
+      </section>
+
+      <!-- Base64 -->
+      <section class="card">
+        <h2>Base64 Encode / Decode</h2>
+        <div class="controls">
+          <input id="b64In" placeholder="Text" style="flex:1" />
+          <button class="btn" onclick="b64enc()">Encode</button>
+          <button class="btn" onclick="b64dec()">Decode</button>
+        </div>
+        <div class="display" id="b64Out">—</div>
+      </section>
+
+      <!-- Password Strength -->
+      <section class="card">
+        <h2>Password Strength Checker</h2>
+        <div class="controls">
+          <input id="pwd" placeholder="Password" style="flex:1" />
+          <button class="btn" onclick="pwdCheck()">Check</button>
+        </div>
+        <div class="display" id="pwdOut">—</div>
+      </section>
+
+      <!-- Full width utilities -->
+      <section class="card full">
+        <h2>Quick Tools: Previous calculators consolidated</h2>
+        <div class="small">You can use any calculator above. This area shows quick help & results clipboard.</div>
+        <div class="controls">
+          <button class="btn" onclick="copyAllResults()">Copy All Visible Results</button>
+          <button class="btn" onclick="clearAll()">Clear Inputs & Outputs</button>
+        </div>
+        <pre class="display" id="quickOut">—</pre>
+      </section>
+
+
+    </div>
+
+    <footer style="text-align:center; padding:10px; background:#111; color:#fff; font-family:Arial; font-size:14px;">
+  Build By Mayank Kumar<br>© 2025 <strong>Site Spark Studio</strong> — All Rights Reserved.
+</footer>
+  </main>
+
+  <script>
+    // ---------- Expression evaluator ----------
+    function evalExpr(){
+      const e = document.getElementById('expr').value.trim();
+      if(!e){ document.getElementById('exprOut').textContent = 'Enter expression'; return }
+      try{ const res = eval(e); document.getElementById('exprOut').textContent = String(res); }
+      catch(err){ document.getElementById('exprOut').textContent = 'Error: '+err }
+    }
+
+    // ---------- Basic calculator ----------
+    let basicExp = '';
+    const basicDisplay = document.getElementById('basicDisplay');
+    function basicPress(v){ basicExp += v; updateBasic(); }
+    function basicOp(op){ if(basicExp === '' && op === '-') { basicExp = '-'; updateBasic(); return } basicExp += ' ' + op + ' '; updateBasic(); }
+    function basicClear(){ basicExp = ''; updateBasic(); }
+    function basicBack(){ basicExp = basicExp.trim(); basicExp = basicExp.slice(0, -1); updateBasic(); }
+    function basicPercent(){ try{ const val = eval(basicExp); basicExp = String(val / 100); updateBasic(); } catch(e){ basicDisplay.textContent = 'Error' } }
+    function basicEquals(){ try{ const res = eval(basicExp); basicExp = String(res); updateBasic(); } catch(e){ basicDisplay.textContent = 'Error' } }
+    function updateBasic(){ basicDisplay.textContent = basicExp || '0' }
+    document.addEventListener('keydown', (e)=>{
+      if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if(e.key.match(/[0-9\.]/)) basicPress(e.key);
+      if(['+','-','/','*'].includes(e.key)) basicOp(e.key);
+      if(e.key === 'Enter') basicEquals();
+      if(e.key === 'Backspace') basicBack();
+    });
+
+    // ---------- Scientific ----------
+    function runScientific(){
+      const x = Number(document.getElementById('sciInput').value);
+      const y = Number(document.getElementById('sciInput2').value);
+      const f = document.getElementById('sciFunc').value;
+      let out = '—';
+      if(isNaN(x)) { document.getElementById('sciDisplay').textContent = 'Enter a number'; return }
+      try{
+        switch(f){
+          case 'sqrt': out = Math.sqrt(x); break;
+          case 'square': out = x*x; break;
+          case 'cube': out = x*x*x; break;
+          case 'ln': out = Math.log(x); break;
+          case 'log10': out = (Math.log10 ? Math.log10(x) : Math.log(x)/Math.LN10); break;
+          case 'sin': out = Math.sin(x * (Math.PI/180)); break;
+          case 'cos': out = Math.cos(x * (Math.PI/180)); break;
+          case 'tan': out = Math.tan(x * (Math.PI/180)); break;
+          case 'fact': out = factorial(x); break;
+          case 'pow': out = Math.pow(x, isNaN(y) ? 2 : y); break;
+        }
+      } catch(err) { out = 'Error' }
+      document.getElementById('sciDisplay').textContent = out;
+    }
+    function factorial(n){ if(n < 0) return 'NaN'; if(n > 170) return 'Overflow'; let r = 1; for(let i=2;i<=Math.floor(n);i++) r *= i; return r }
+
+    // ---------- Units ----------
+    const units = {
+      length: { m:1, km:1000, cm:0.01, mm:0.001, in:0.0254, ft:0.3048 },
+      weight: { kg:1, g:0.001, mg:0.000001, lb:0.45359237, oz:0.0283495 },
+      temperature: ['C','F','K'],
+      speed: { mps:1, kph:1000/3600, mph:1609.344 }
+    };
+    function renderUnitOptions(){
+      const t = document.getElementById('unitType').value;
+      const from = document.getElementById('unitFrom'); const to = document.getElementById('unitTo');
+      from.innerHTML = ''; to.innerHTML = '';
+      if(t === 'temperature'){
+        units.temperature.forEach(x => { const o = document.createElement('option'); o.value = x; o.textContent = x; from.appendChild(o); to.appendChild(o.cloneNode(true)); });
+      } else {
+        for(const k in units[t]){ const o = document.createElement('option'); o.value = k; o.textContent = k; from.appendChild(o); to.appendChild(o.cloneNode(true)); }
+      }
+    }
+    renderUnitOptions();
+    function convertUnit(){ const t = document.getElementById('unitType').value; const v = Number(document.getElementById('unitVal').value); const f = document.getElementById('unitFrom').value; const to = document.getElementById('unitTo').value; if(isNaN(v)){ document.getElementById('unitResult').textContent='Enter value'; return }
+      if(t === 'temperature'){ document.getElementById('unitResult').textContent = tempConvert(v,f,to); return }
+      const base = units[t][f]; const target = units[t][to]; const baseMeters = v * base; const out = baseMeters / target; document.getElementById('unitResult').textContent = out; }
+    function tempConvert(v, from, to){ let c; if(from === 'C') c = v; if(from === 'F') c = (v - 32) * 5/9; if(from === 'K') c = v - 273.15; if(to === 'C') return c; if(to === 'F') return (c * 9/5) + 32; if(to === 'K') return c + 273.15 }
+
+    // ---------- Currency (offline) ----------
+    const rates = { INR:1, USD:0.012, EUR:0.0097, GBP:0.0086 };
+    function convertCurrency(){ const v = Number(document.getElementById('curVal').value); const f = document.getElementById('curFrom').value; const to = document.getElementById('curTo').value; if(isNaN(v)){ document.getElementById('curResult').textContent='Enter amount'; return }
+      // convert f -> INR -> to (using rates as INR per unit fallback)
+      const inINR = v * (f === 'INR' ? 1 : (1 / (rates[f] || 1)));
+      const out = inINR * (rates[to] || 1);
+      document.getElementById('curResult').textContent = out.toFixed(4) + ' ' + to + ' (offline rates)'; }
+
+    // ---------- BMI ----------
+    function calcBMI(){ const w = Number(document.getElementById('bmiW').value); const h = Number(document.getElementById('bmiH').value); if(!w || !h){ document.getElementById('bmiOut').textContent='Enter weight & height'; return } const bmi = w / ((h/100)*(h/100)); let cat=''; if(bmi<18.5) cat='Underweight'; else if(bmi<25) cat='Normal'; else if(bmi<30) cat='Overweight'; else cat='Obese'; document.getElementById('bmiOut').textContent = bmi.toFixed(2) + ' — ' + cat }
+
+    // ---------- EMI & amortization ----------
+    function calcEMI(showSchedule){ const P = Number(document.getElementById('loanP').value); const annual = Number(document.getElementById('loanR').value); const years = Number(document.getElementById('loanN').value); if(!P || !annual || !years){ document.getElementById('loanOut').textContent='Enter all fields'; return }
+      const r = annual/12/100; const n = years*12; const emi = (P*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1); const total = emi * n; const interest = total - P; let out = `EMI: ₹${emi.toFixed(2)} | Total: ₹${total.toFixed(2)} | Interest: ₹${interest.toFixed(2)}`;
+      if(showSchedule){ out += "\n\nAmortization (first 6 months):\nMonth | Payment | Interest | Principal | Balance\n"; let bal = P; for(let m=1; m<=Math.min(6,n); m++){ const interestAmt = bal * r; const principal = emi - interestAmt; bal -= principal; out += `${m} | ${emi.toFixed(2)} | ${interestAmt.toFixed(2)} | ${principal.toFixed(2)} | ${Math.max(bal,0).toFixed(2)}\n`; } }
+      document.getElementById('loanOut').textContent = out; }
+
+    // ---------- Percentage ----------
+    function calcPercent(){ const a = Number(document.getElementById('pA').value); const b = Number(document.getElementById('pB').value); if(isNaN(a)||isNaN(b)||b===0){ document.getElementById('pctOut').textContent = 'Invalid'; return } document.getElementById('pctOut').textContent = (a/b*100).toFixed(2) + '%'; }
+    function calcChange(){ const a = Number(document.getElementById('pA').value); const b = Number(document.getElementById('pB').value); if(isNaN(a)||isNaN(b)||b===0){ document.getElementById('pctOut').textContent = 'Invalid'; return } document.getElementById('pctOut').textContent = ((a-b)/b*100).toFixed(2) + '%'; }
+
+    // ---------- Statistics ----------
+    function doStats(){ const raw = document.getElementById('statsIn').value; const s = raw.split(',').map(x=>Number(x.trim())).filter(x=>!isNaN(x)); if(s.length===0){ document.getElementById('statsOut').textContent='Enter numbers'; return } s.sort((a,b)=>a-b); const n = s.length; const sum = s.reduce((a,b)=>a+b,0); const mean = sum/n; const median = (n%2? s[(n-1)/2] : (s[n/2-1]+s[n/2])/2); const mode = calcMode(s); const variance = s.reduce((acc,v)=>acc+Math.pow(v-mean,2),0)/n; const std = Math.sqrt(variance); document.getElementById('statsOut').textContent = `n=${n} | mean=${mean.toFixed(4)} | median=${median} | mode=${mode} | variance=${variance.toFixed(4)} | std=${std.toFixed(4)}` }
+    function calcMode(arr){ const m={}; let max=0, mode=null; for(const v of arr){ m[v]=(m[v]||0)+1; if(m[v]>max){ max=m[v]; mode=v } } return mode }
+
+    // ---------- Number tools ----------
+    function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); if(!b) return a; return gcd(b, a % b); }
+    function gcdlcm(){ const a = Number(document.getElementById('numA').value); const b = Number(document.getElementById('numB').value); if(isNaN(a)||isNaN(b)||a===0||b===0){ document.getElementById('numOut').textContent='Enter two non-zero numbers'; return } const g = gcd(a,b); const l = Math.abs(a*b)/g; document.getElementById('numOut').textContent = `GCD=${g} | LCM=${l}` }
+    function isPrime(){ const n = Number(document.getElementById('numA').value); if(isNaN(n) || n<2){ document.getElementById('numOut').textContent='Not prime'; return } for(let i=2;i<=Math.sqrt(n);i++) if(n%i===0){ document.getElementById('numOut').textContent='Not prime'; return } document.getElementById('numOut').textContent='Prime' }
+    function baseConvert(){ const a = Number(document.getElementById('numA').value); if(isNaN(a)){ document.getElementById('numOut').textContent='Enter number A'; return } document.getElementById('numOut').textContent = `Binary: ${a.toString(2)} | Octal: ${a.toString(8)} | Hex: ${a.toString(16).toUpperCase()}` }
+
+    // ---------- Date diff ----------
+    function dateDiff(){ const f = document.getElementById('dFrom').value; const t = document.getElementById('dTo').value || new Date().toISOString().slice(0,10); if(!f){ document.getElementById('dateOut').textContent='Select From date'; return } const d1 = new Date(f); const d2 = new Date(t); if(d2 < d1){ document.getElementById('dateOut').textContent='To date is before From'; return } const diffMs = d2 - d1; const days = Math.floor(diffMs / 86400000); const years = Math.floor(days/365); const months = Math.floor((days - years*365)/30); document.getElementById('dateOut').textContent = `${years} years, ${months} months, ${days} days` }
+// ---------- Helpers ----------
+    function el(id){ return document.getElementById(id) }
+    function safeNum(v){ const n = Number(v); return isNaN(n) ? null : n }
+
+    // ---------- Matrix (supports 2x2 and 3x3) ----------
+    function parseMatrix(str){ // rows separated by ;, cols by ,
+      if(!str) return null; try{ const rows = str.split(';').map(r=>r.split(',').map(x=>Number(x.trim()))); const cols = rows[0].length; if(rows.some(r=>r.length!==cols)) return null; return rows; }catch(e){ return null } }
+    function matToStr(m){ return m.map(r=>r.join('\t')).join('\n') }
+    function matAdd(){ const A=parseMatrix(el('matA').value); const B=parseMatrix(el('matB').value); if(!A||!B) { el('matOut').textContent='Invalid matrices'; return } if(A.length!==B.length||A[0].length!==B[0].length){ el('matOut').textContent='Dimension mismatch'; return } const R=A.map((r,i)=>r.map((v,j)=>v + B[i][j])); el('matOut').textContent = matToStr(R) }
+    function matSub(){ const A=parseMatrix(el('matA').value); const B=parseMatrix(el('matB').value); if(!A||!B){ el('matOut').textContent='Invalid matrices'; return } if(A.length!==B.length||A[0].length!==B[0].length){ el('matOut').textContent='Dimension mismatch'; return } const R=A.map((r,i)=>r.map((v,j)=>v - B[i][j])); el('matOut').textContent = matToStr(R) }
+    function matMul(){ const A=parseMatrix(el('matA').value); const B=parseMatrix(el('matB').value); if(!A||!B){ el('matOut').textContent='Invalid matrices'; return } if(A[0].length !== B.length){ el('matOut').textContent='Cols of A must equal rows of B'; return } const R = Array.from({length:A.length}, ()=>Array(B[0].length).fill(0)); for(let i=0;i<A.length;i++) for(let j=0;j<B[0].length;j++) for(let k=0;k<A[0].length;k++) R[i][j]+=A[i][k]*B[k][j]; el('matOut').textContent = matToStr(R) }
+    function det2(m){ return m[0][0]*m[1][1] - m[0][1]*m[1][0] }
+    function det3(m){ return m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1]) - m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0]) + m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0]) }
+    function matDetA(){ const A=parseMatrix(el('matA').value); if(!A) { el('matOut').textContent='Invalid matrix'; return } if(A.length===2 && A[0].length===2){ el('matOut').textContent = 'det(A) = ' + det2(A) } else if(A.length===3 && A[0].length===3){ el('matOut').textContent = 'det(A) = ' + det3(A) } else el('matOut').textContent='Only 2x2 or 3x3 supported for determinant' }
+    function inverse2(m){ const d = det2(m); if(d===0) return null; return [[m[1][1]/d, -m[0][1]/d], [-m[1][0]/d, m[0][0]/d]] }
+    function inverse3(m){ const d = det3(m); if(d===0) return null; // adjugate / d
+      const adj = [
+        [ (m[1][1]*m[2][2]-m[1][2]*m[2][1]), -(m[0][1]*m[2][2]-m[0][2]*m[2][1]),  (m[0][1]*m[1][2]-m[0][2]*m[1][1]) ],
+        [-(m[1][0]*m[2][2]-m[1][2]*m[2][0]),  (m[0][0]*m[2][2]-m[0][2]*m[2][0]), -(m[0][0]*m[1][2]-m[0][2]*m[1][0]) ],
+        [ (m[1][0]*m[2][1]-m[1][1]*m[2][0]), -(m[0][0]*m[2][1]-m[0][1]*m[2][0]),  (m[0][0]*m[1][1]-m[0][1]*m[1][0]) ]
+      ];
+      // transpose of cofactor (adj) then divide by d
+      const inv = adj.map(r=>r.map(v=>v/d));
+      return inv;
+    }
+    function matInvA(){ const A=parseMatrix(el('matA').value); if(!A) { el('matOut').textContent='Invalid matrix'; return } if(A.length===2 && A[0].length===2){ const inv = inverse2(A); if(!inv) el('matOut').textContent='Singular matrix'; else el('matOut').textContent = matToStr(inv) } else if(A.length===3 && A[0].length===3){ const inv = inverse3(A); if(!inv) el('matOut').textContent='Singular matrix'; else el('matOut').textContent = matToStr(inv) } else el('matOut').textContent='Only 2x2 or 3x3 supported for inverse' }
+
+    // ---------- Equation Solver ----------
+    function solveEq(){ const a = safeNum(el('eqA').value); const b = safeNum(el('eqB').value); const c = safeNum(el('eqC').value); if(a===null||b===null){ el('eqOut').textContent='Enter a and b' ; return }
+      if(el('eqC').value.trim()===''){ // linear ax + b = 0
+        if(a===0){ el('eqOut').textContent = b===0 ? 'Infinite solutions' : 'No solution'; return } el('eqOut').textContent = 'x = ' + (-b/a); return
+      }
+      // quadratic
+      if(a===0){ el('eqOut').textContent='a cannot be 0 for quadratic'; return }
+      const D = b*b - 4*a*c; if(D<0){ el('eqOut').textContent = `Two complex roots: ${(-b/(2*a)).toFixed(4)} ± ${Math.sqrt(-D)/(2*a)}i`; return } const r1 = (-b + Math.sqrt(D))/(2*a); const r2 = (-b - Math.sqrt(D))/(2*a); el('eqOut').textContent = `Roots: ${r1}, ${r2}` }
+
+    // ---------- GST / Discounts ----------
+    function applyPercent(){ const p = safeNum(el('price').value); const pc = safeNum(el('percent').value); const t = el('pctType').value; if(p===null||pc===null){ el('gstOut').textContent='Enter price and percent'; return } if(t==='add') el('gstOut').textContent = `Result: ${(p*(1+pc/100)).toFixed(2)} (added ${pc}%)`; else el('gstOut').textContent = `Result: ${(p*(1-pc/100)).toFixed(2)} (reduced ${pc}%)` }
+
+    // ---------- Compound Interest ----------
+    function calcCompound(){ const P=safeNum(el('ciP').value); const r=safeNum(el('ciR').value); const n=safeNum(el('ciN').value); const t=safeNum(el('ciT').value); if(P===null||r===null||n===null||t===null){ el('ciOut').textContent='Enter all fields'; return } const A = P * Math.pow(1 + (r/100)/n, n*t); el('ciOut').textContent = `Amount: ${A.toFixed(2)} | Interest: ${(A-P).toFixed(2)}` }
+
+    // ---------- SIP ----------
+    function calcSIP(){ const m=safeNum(el('sipAmt').value); const R=safeNum(el('sipRate').value); const yrs=safeNum(el('sipYears').value); if(m===null||R===null||yrs===null){ el('sipOut').textContent='Enter all fields'; return } const r = R/100; const n = yrs*12; const monthlyRate = r/12; const fv = m * ( (Math.pow(1+monthlyRate, n) -1) / monthlyRate ) * (1+monthlyRate); el('sipOut').textContent = `Future value: ${fv.toFixed(2)} | Invested: ${(m*n).toFixed(2)} | Gain: ${(fv - m*n).toFixed(2)}` }
+
+    // ---------- Time converter ----------
+    function convertTime(){ const v=safeNum(el('timeVal').value); const from=el('timeFrom').value; const to=el('timeTo').value; if(v===null){ el('timeOut').textContent='Enter value'; return } const factors={s:1,m:60,h:3600,d:86400}; const sec = v * factors[from]; const out = sec / factors[to]; el('timeOut').textContent = out }
+
+    // ---------- Fuel Mileage ----------
+    function calcMileage(){ const d=safeNum(el('dist').value); const f=safeNum(el('fuel').value); if(d===null||f===null||f===0){ el('mileageOut').textContent='Enter valid distance and fuel'; return } const kmpl = d / f; const lper100 = (f / d) * 100; el('mileageOut').textContent = `km/l = ${kmpl.toFixed(2)} | l/100km = ${lper100.toFixed(2)}` }
+
+    // ---------- Electricity Bill (simple slabs) ----------
+    function estimateBill(){ const u = safeNum(el('unitsUsed').value); if(u===null){ el('billOut').textContent='Enter units'; return } // simple example slabs
+      let cost = 0; let rem = u;
+      const slabs = [ {limit:100, rate:3}, {limit:200, rate:4}, {limit:200, rate:5}, {limit:Infinity, rate:6} ];
+      for(const s of slabs){ const take = Math.min(rem, s.limit); cost += take * s.rate; rem -= take; if(rem<=0) break }
+      el('billOut').textContent = `Estimated bill: ₹${cost.toFixed(2)}` }
+
+    // ---------- Physics ----------
+    function calcForce(){ const m=safeNum(el('mass').value); const a=safeNum(el('acc').value); if(m===null||a===null){ el('physOut').textContent='Enter mass and acceleration'; return } el('physOut').textContent = `Force = ${ (m*a).toFixed(4) } N` }
+    function calcKE(){ const m=safeNum(el('massE').value); const v=safeNum(el('vel').value); if(m===null||v===null){ el('physOut').textContent='Enter mass and velocity'; return } el('physOut').textContent = `KE = ${(0.5*m*v*v).toFixed(4)} J` }
+    function calcPressure(){ const F=safeNum(el('forceP').value); const A=safeNum(el('areaP').value); if(F===null||A===null||A===0){ el('physOut').textContent='Enter force and non-zero area'; return } el('physOut').textContent = `Pressure = ${(F/A).toFixed(4)} Pa` }
+
+    // ---------- Ohm's law ----------
+    function ohmCalc(){ const V=safeNum(el('voltage').value); const I=safeNum(el('current').value); const R=safeNum(el('resistance').value); let out = [];
+      if(V!==null && I!==null) out.push(`R = ${(V/I).toFixed(4)} Ω`);
+      if(V!==null && R!==null) out.push(`I = ${(V/R).toFixed(4)} A`);
+      if(I!==null && R!==null) out.push(`V = ${(I*R).toFixed(4)} V`);
+      if(out.length===0) el('ohmOut').textContent='Enter any two values'; else el('ohmOut').textContent = out.join(' | ') }
+
+    // ---------- Resistor color code ----------
+    const colors = ['black','brown','red','orange','yellow','green','blue','violet','grey','white'];
+    function initResistor(){ const selIds=['rc1','rc2','rc3','rc4']; selIds.forEach(id=>{ const s = el(id); s.innerHTML=''; colors.forEach((c,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent = `${c}`; s.appendChild(o) }) }) }
+    initResistor();
+    function resistorCalc(){ const d1 = Number(el('rc1').value); const d2 = Number(el('rc2').value); const mul = Math.pow(10, Number(el('rc3').value)); const tolIdx = Number(el('rc4').value); const val = (d1*10 + d2) * mul; const tol = tolIdx===1? '±1%': tolIdx===2? '±2%':'±5%'; el('resOut').textContent = `${val} Ω ${tol}` }
+
+    // ---------- Speed/Distance/Time ----------
+    function calcSDT(){ const s = safeNum(el('spd').value); const d = safeNum(el('dist2').value); const t = safeNum(el('time2').value); if(s===null && d!==null && t!==null){ el('sdtOut').textContent = `Speed = ${(d/t).toFixed(4)} km/h`; return }
+      if(d===null && s!==null && t!==null){ el('sdtOut').textContent = `Distance = ${(s*t).toFixed(4)} km`; return }
+      if(t===null && d!==null && s!==null){ el('sdtOut').textContent = `Time = ${(d/s).toFixed(4)} hours`; return }
+      el('sdtOut').textContent='Provide any two values to compute the third' }
+
+    // ---------- Base converters & bitwise ----------
+    function baseAll(){ const a = safeNum(el('baseNum').value); if(a===null){ el('baseOut').textContent='Enter decimal number'; return } el('baseOut').textContent = `Binary: ${a.toString(2)} | Octal: ${a.toString(8)} | Hex: ${a.toString(16).toUpperCase()}` }
+    function bitwiseOps(){ const A = parseInt(el('bitA').value); const B = parseInt(el('bitB').value); if(isNaN(A)||isNaN(B)){ el('baseOut').textContent='Enter integers for bitwise ops'; return } el('baseOut').textContent = `AND: ${A & B} | OR: ${A | B} | XOR: ${A ^ B}` }
+
+    // ---------- Base64 ----------
+    function b64enc(){ const s = el('b64In').value; try{ const out = btoa(unescape(encodeURIComponent(s))); el('b64Out').textContent = out }catch(e){ el('b64Out').textContent = 'Error' } }
+    function b64dec(){ const s = el('b64In').value; try{ const out = decodeURIComponent(escape(atob(s))); el('b64Out').textContent = out }catch(e){ el('b64Out').textContent = 'Invalid base64' } }
+
+    // ---------- Password strength ----------
+    function pwdCheck(){ const p = el('pwd').value; if(!p){ el('pwdOut').textContent='Enter password'; return } let score=0; if(p.length>=8) score++; if(/[a-z]/.test(p)) score++; if(/[A-Z]/.test(p)) score++; if(/[0-9]/.test(p)) score++; if(/[^A-Za-z0-9]/.test(p)) score++; const strength = ['Very weak','Weak','Moderate','Good','Strong','Very strong'][score]; el('pwdOut').textContent = `Strength: ${strength} (score ${score}/5)` }
+
+    // ---------- Quick utilities ----------
+    function copyAllResults(){ let text=''; const ids = ['matOut','eqOut','gstOut','ciOut','sipOut','timeOut','mileageOut','billOut','physOut','ohmOut','resOut','sdtOut','baseOut','b64Out','pwdOut']; ids.forEach(id=>{ const v = el(id).textContent; if(v && v.trim() && v.trim()!=='—') text += `${id}: ${v}\n` }); if(!text) text='No results'; navigator.clipboard.writeText(text).then(()=> el('quickOut').textContent='Copied to clipboard') .catch(()=> el('quickOut').textContent='Clipboard not available') }
+    function clearAll(){ const inputs = document.querySelectorAll('input'); inputs.forEach(i=>i.value=''); const outs = document.querySelectorAll('.display, pre'); outs.forEach(o=>o.textContent='—'); el('quickOut').textContent='Cleared' }
+
+    // initialize some selects
+    renderUnitOptions(); // from previous file is not needed but safe
+  </script>
+</body>
+</html>
